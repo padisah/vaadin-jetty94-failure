@@ -12,7 +12,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.test.MyUI.MyUIServlet;
+
+import com.vaadin.server.communication.JSR356WebsocketInitializer;
 
 public class Starter {
 
@@ -34,13 +37,10 @@ public class Starter {
 
         // Webapp context handler
         final WebAppContext webAppContext = new WebAppContext();
-        {
-            webAppContext.setDisplayName("TEST");
-            webAppContext.setContextPath("/");
-            webAppContext.setBaseResource(Resource.newResource(new File("src/main/webapp")));
-            ServletHolder sh = webAppContext.addServlet(MyUIServlet.class, "/*");
-            sh.setInitParameter(ApplicationConfig.PROPERTY_COMET_SUPPORT, "org.atmosphere.container.Jetty93AsyncSupportWithWebSocket");
-        }
+        webAppContext.setDisplayName("TEST");
+        webAppContext.setContextPath("/");
+        webAppContext.setBaseResource(Resource.newResource(new File("src/main/webapp")));
+        webAppContext.addServlet(MyUIServlet.class, "/*");
 
         // HTTP Configuration
         final var http_config = new HttpConfiguration();
@@ -61,6 +61,8 @@ public class Starter {
         handlers.setHandlers(new Handler[] { webAppContext });
         server.setHandler(handlers);
 
+        WebSocketServerContainerInitializer.configureContext(webAppContext);
+        
         try {
             server.start();
         } catch (Exception e) {

@@ -1,5 +1,9 @@
 package org.test;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.servlet.ServletConfig;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 
@@ -24,7 +28,7 @@ import com.vaadin.ui.VerticalLayout;
  * overridden to add component to the user interface and initialize non-component functionality.
  */
 @Theme("mytheme")
-@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
+@Push(value = PushMode.MANUAL, transport = Transport.WEBSOCKET_XHR)
 public class MyUI extends UI {
 
     @Override
@@ -43,16 +47,23 @@ public class MyUI extends UI {
         layout.addComponents(name, button);
         
         setContent(layout);
+        
+        Timer t = new Timer(true);
+        t.schedule(new TimerTask() {
+            
+            @Override
+            public void run() {
+                name.setCaption(name.getCaption() + "x");
+                MyUI.this.push();
+            }
+        }, 500, 500);
     }
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true, initParams = {
-            @WebInitParam(value = "org.atmosphere.cpr.asyncSupport", name = "org.atmosphere.container.Jetty93AsyncSupportWithWebSocket"),
-            //@WebInitParam(value = "org.atmosphere.cpr.asyncSupport", name = "org.atmosphere.container.JSR356AsyncSupport")
-            //@WebInitParam(value = "org.atmosphere.cpr.asyncSupport", name = "org.atmosphere.container.BlockingIOCometSupport")
+            @WebInitParam(value = "org.atmosphere.cpr.asyncSupport", name = "org.atmosphere.container.JSR356AsyncSupport"),
     })
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
-        
-        
+
     }
 }
