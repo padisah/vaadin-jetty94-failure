@@ -1,5 +1,7 @@
 # vaadin-jetty94-failure
-Demonstrates incompatiblity between vaadin 8.8.1 and Jetty 9.4
+This brach contains a workaround for the issue. I could successfully configure using jetty9.4 with JSR356, and also Guice.
+
+The base repository Demonstrates incompatiblity between vaadin 8.8.1 and Jetty 9.4.
 
 executable jar:
 mvn clean compile package
